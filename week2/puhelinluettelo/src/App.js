@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
 import PersonFilter from './components/PersonFilter'
 import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -31,9 +33,22 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          setErrorMessage(
+            `'${personObject.name}' added to phonebook`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+
         })
     } else {
-      window.alert(`${newName} is already added to phonebook`);
+      setErrorMessage(
+        `'${personObject.name}' was already added to phonebook`
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      // window.alert(`${newName} is already added to phonebook`);
     }
   }
 
@@ -59,6 +74,13 @@ const App = () => {
         .then(response => {
           setPersons(persons.filter(person => (person.id !== id)))
         })
+      setErrorMessage(
+        `'${personObject.name}' was deleted from phonebook`
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      // window.alert(`${newName} is already added to phonebook`);  
     }
   }
 
@@ -72,6 +94,7 @@ const App = () => {
         </div>
       </form>
       <h2>add a new</h2>
+      <Notification message={errorMessage} />
       <PersonForm newName={newName} newNumber={newNumber}
         addPerson={addPerson} handlePersonChange={handlePersonChange}
         handleNumberChange={handleNumberChange} />
@@ -80,7 +103,6 @@ const App = () => {
         deletePerson={deletePerson} />
     </div>
   )
-
 }
 
 export default App

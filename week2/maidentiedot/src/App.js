@@ -23,9 +23,8 @@ const App = () => {
         setCountryNames(countries.name)
       })
   }, [])
-  console.log('render', countries.length, 'all')
+  //console.log('render', countries.length, 'all')
 
-  console.log(countries[0])
   return (
     <div>
       find countries<input value={newFilter} onChange={handleFilterChange} />

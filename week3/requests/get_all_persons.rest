@@ -1,1 +1,3 @@
-GET http://localhost:3001/api/persons/
+#GET http://localhost:3001/api/persons/
+
+GET https://still-meadow-44319.herokuapp.com/api/persons

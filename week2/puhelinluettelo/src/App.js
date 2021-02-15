@@ -26,6 +26,8 @@ const App = () => {
       name: newName,
       number: newNumber
     }
+
+
     if (!persons.some(person => person.name === newName)) {
       personService
         .create(personObject)
@@ -42,13 +44,22 @@ const App = () => {
 
         })
     } else {
-      setErrorMessage(
-        `'${personObject.name}' was already added to phonebook`
-      )
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      // window.alert(`${newName} is already added to phonebook`);
+      const id = persons.find(person => person.name === newName).id
+      if (window.confirm(`Change number for ${personObject.name}?`)) {
+        personService
+          .update(id, personObject)
+          .then(returnedPerson => {
+            setPersons((persons.filter(person => person.id !== id)).concat(returnedPerson))
+            setNewName('')
+            setNewNumber('')
+            setErrorMessage(
+              `'${personObject.name}' number changed`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          })
+      }
     }
   }
 
@@ -80,7 +91,6 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
-      // window.alert(`${newName} is already added to phonebook`);  
     }
   }
 

@@ -27,7 +27,6 @@ const App = () => {
       number: newNumber
     }
 
-
     if (!persons.some(person => person.name === newName)) {
       personService
         .create(personObject)

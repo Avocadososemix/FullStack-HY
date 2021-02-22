@@ -7,14 +7,25 @@ const initialBlogs = [
         author: 'Michael Chan',
         url: 'https://reactpatterns.com/',
         likes: 7,
+        userId: '60342211a2af4d40be568c90'
     },
     {
-
         title: 'Go To Statement Considered Harmful',
         author: 'Edsger W. Dijkstra',
         url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         likes: 5,
+        userId: '60342211a2af4d40be568c90'
     },
+]
+
+const initialUsers = [
+    {
+        _id: '6034229d1de287414ae08f7c',
+        blogs: [],
+        username: 'mluukkai',
+        name: 'Matti Luukkainen',
+        passwordHash: '$2b$10$lzXvzyFuJ0IPATmQuRDzdeUJS2mb7/2KOn9g2GpEe/Qo.FW6H4M4S',
+    }
 ]
 
 const nonExistingId = async () => {
@@ -36,5 +47,5 @@ const usersInDb = async () => {
 }
 
 module.exports = {
-    initialBlogs, nonExistingId, blogsInDb, usersInDb
+    initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb
 }

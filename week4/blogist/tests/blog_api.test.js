@@ -145,17 +145,22 @@ test('4.11 blog without likes receives 0 likes', async () => {
 })
 
 test('4.12 adding blog without title or url fails', async () => {
+    
+    const user = helper.initialBlogs[0]
     const newBlog = [{
         author: 'Michael Chan',
         likes: 3,
+        userID: user._id
     }, {
         title: 'Some title',
         author: 'Michael Chan',
         likes: 3,
+        userID: user._id
     }, {
         author: 'Michael Chan',
         url: 'www.testurl.com',
         likes: 3,
+        userID: user._id
     }
     ]
 

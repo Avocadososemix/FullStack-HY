@@ -2,8 +2,9 @@ POST http://localhost:3003/api/blogs/
 Content-Type: application/json
 
 {
-    "title": "Mikin Blogi #2",
-    "author": "Mikki Hiiri",
-    "url": "www.jee2.com",
-    "likes": 234
+    "title": "Hessun mietinnät",
+    "author": "Hessu Hopo",
+    "url": "www.jee3.com",
+    "likes": 22,
+    "userId": "60342211a2af4d40be568c90"
 }

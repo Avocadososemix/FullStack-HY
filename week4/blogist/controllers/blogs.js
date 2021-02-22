@@ -1,56 +1,37 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
-blogsRouter.get('/', (request, response) => {
-    console.log('getti')
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
+blogsRouter.get('/', async (request, response) => {
+    const blogs = await Blog
+        .find({}).populate('user', { username: 1, name: 1 , url: 1 })
+
+    response.json(blogs.map(blog => blog.toJSON()))
 })
 
-// blogsRouter.post('/', (request, response) => {
-//     const blog = new Blog(request.body)
-//     console.log('posti')
-//     blog
-//         .save()
-//         .then(result => {
-//             response.status(201).json(result)
-//         })
-// })
-
-// blogsRouter.post('/', async (request, response, next) => {
-//     const body = request.body
-
-//     const blog = new Blog({
-//         title: body.content,
-//         author: body.author === undefined ? 'unknown' : body.author,
-//         url: body.url === undefined ? 'unknown' : body.url,
-//         likes: body.likes === undefined ? 0 : body.likes,
-//     })
-//     try {
-//         const savedBlog = await blog.save()
-//         response.json(savedBlog.toJSON())
-//     } catch(exception) {
-//         next(exception)
-//     }
-// })
-
 blogsRouter.post('/', async (request, response) => {
+    console.log('blog post ', request.body)
     const body = request.body
+
+    const user = await User.findById(body.userId)
 
     const blog = new Blog({
         title: body.title,
         author: body.author === undefined ? 'unknown' : body.author,
         url: body.url,
         likes: body.likes === undefined ? 0 : body.likes,
+        user: user._id,
+        // user: user._id === undefined ? '603410394edac231711e35cc' : user._id,
     })
+    // temporarily add root as Blog user, change later!
 
     if (blog.title === undefined || blog.url === undefined) {
         response.status(400).end()
     } else {
         const savedBlog = await blog.save()
+        user.blogs = user.blogs.concat(savedBlog._id)
+        await user.save()
+
         response.json(savedBlog.toJSON())
     }
 })

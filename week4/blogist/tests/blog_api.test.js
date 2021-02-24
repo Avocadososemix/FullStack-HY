@@ -1,184 +1,187 @@
+const { before } = require('lodash')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const helper = require('./test_helper')
-const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const { initialBlogs, blogsInDb, userInDb } = require('./test_helper')
 
-beforeEach(async () => {
-    await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
-})
+const api = supertest(app)
 
-test('blogs are returned as json', async () => {
-    await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-})
+describe('when there are some blogs in database', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+        await Blog.deleteMany({})
 
-test('all blogs are returned', async () => {
-    const response = await api.get('/api/blogs')
+        const testUser = {
+            username: 'tester',
+            password: 'secred'
+        }
 
-    expect(response.body).toHaveLength(helper.initialBlogs.length)
-})
+        await api
+            .post('/api/users')
+            .send(testUser)
+            .expect(200)
 
-test('4.8 a specific blog is within the returned blogs', async () => {
-    const response = await api.get('/api/blogs')
+        const user = await userInDb()
 
-    const contents = response.body.map(r => r.title)
+        let blog = new Blog(initialBlogs[0])
 
-    expect(contents).toContain(
-        'React patterns'
-    )
-})
+        blog.user = user
 
-test('4.9 blogs are identified with an', async () => {
-    const response = await api.get('/api/blogs')
+        await blog.save()
+        user.blogs = user.blogs.concat(blog)
 
-    const contents = response.body.map(r => r.title)
+        blog = new Blog(initialBlogs[1])
+        blog.user = user
+        await blog.save()
+        user.blogs = user.blogs.concat(blog)
 
-    expect(contents).toContain(
-        'React patterns'
-    )
-})
+        await user.save()
+    })
 
-test('4.10 a valid blog can be added ', async () => {
-    const newBlog = {
-        title: 'React patterns',
-        author: 'Michael Chan',
-        url: 'https://reactpatterns.com/',
-        likes: 7
-    }
+    test('those are returned as json', async () => {
+        const response = await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+        expect(response.body).toHaveLength(initialBlogs.length)
+    })
 
-    const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+    test('those have identifier id', async () => {
+        const response = await api
+            .get('/api/blogs')
 
-    const titles = blogsAtEnd.map(n => n.title)
-    expect(titles).toContain(
-        'React patterns'
-    )
-})
+        expect(response.body[0].id).toBeDefined()
+        expect(response.body[0]._id).not.toBeDefined()
+    })
 
-test('blog without title is not added', async () => {
-    const newBlog = {
-        author: 'Mister Cake'
-    }
+    test('those can be deleted', async () => {
+        const response = await api
+            .post('/api/login/')
+            .send({
+                username: 'tester',
+                password: 'secred'
+            })
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
+        const { token } = response.body
 
-    const blogsAtEnd = await helper.blogsInDb()
+        const blogsBefore = await blogsInDb()
 
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
-})
+        await api
+            .delete(`/api/blogs/${blogsBefore[0].id}`)
+            .set('Authorization', `bearer ${token}`)
+            .expect(204)
 
-test('3.9 a specific blog can be viewed using the id', async () => {
-    const blogsAtStart = await helper.blogsInDb()
+        const blogsAfter = await blogsInDb()
 
-    const blogToView = blogsAtStart[0]
-    expect(blogToView.id).toBeDefined()
+        expect(blogsAfter).toHaveLength(initialBlogs.length-1)
+    })
 
-    const resultBlog = await api
-        .get(`/api/blogs/${blogToView.id}`)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+    test('those can be edited', async () => {
+        const blogsBefore = await blogsInDb()
+        const editedBlog = blogsBefore[0]
+        const likesAtStart = editedBlog.likes
+        editedBlog.likes += 1
 
-    const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
+        // eslint-disable-next-line no-unused-vars
+        const response = await api
+            .put(`/api/blogs/${blogsBefore[0].id}`)
+            .send(editedBlog)
+            .expect(200)
 
-    expect(resultBlog.body.id).toEqual(blogToView.id)
-    expect(resultBlog.body).toEqual(processedBlogToView)
-})
+        const blogsAfter = await blogsInDb()
+        expect(blogsAfter[0].likes).toBe(likesAtStart + 1)
+    })
 
-test('a blog can be deleted', async () => {
-    const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+    describe('additon of a blog', () => {
+        let token = null
+        beforeEach(async () => {
+            const response = await api
+                .post('/api/login/')
+                .send({
+                    username: 'tester',
+                    password: 'secred'
+                })
 
-    await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
-        .expect(204)
+            token  = response.body.token
+        })
 
-    const blogsAtEnd = await helper.blogsInDb()
+        test('succeeds with valid fields', async () => {
+            const newBlog = {
+                title: 'Goto considered harmful',
+                author: 'Edsger W. Dijkstra',
+                url: 'http://ewd.nl/goto.html',
+                likes: 100,
+            }
 
-    expect(blogsAtEnd).toHaveLength(
-        helper.initialBlogs.length - 1
-    )
+            await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('Authorization', `bearer ${token}`)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
 
-    const titles = blogsAtEnd.map(r => r.title)
+            const blogsAfter = await blogsInDb()
 
-    expect(titles).not.toContain(blogToDelete.title)
-})
+            expect(blogsAfter).toHaveLength(initialBlogs.length + 1)
+            const contents = blogsAfter.map(({ title, author }) => ({ title, author } ))
+            expect(contents).toContainEqual({
+                title: 'Goto considered harmful',
+                author: 'Edsger W. Dijkstra',
+            })
+        })
 
-test('4.11 blog without likes receives 0 likes', async () => {
-    const newBlog = {
-        title: 'React magic patterns',
-        author: 'Michael Chan',
-        url: 'https://reactpatterns.com/',
-    }
+        test('initializes likes to zero by default', async () => {
+            const newBlog = {
+                author: 'Bernrand Meyer',
+                title: 'Touch of Class: Learning to Program Well with Objects and Contracts',
+                url: 'http://www.google.com',
+            }
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+            const respone = await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('Authorization', `bearer ${token}`)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
 
-    const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+            const blogsAfter = await blogsInDb()
+            const addedBlog = blogsAfter.find(b => b.title === newBlog.title)
 
-    const title = blogsAtEnd.map(n => n.title)
-    expect(title).toContain(
-        'React magic patterns'
-    )
+            expect(addedBlog.likes).toBe(0)
+            expect(respone.body.likes).toBe(0)
+        })
 
-    const likes = blogsAtEnd.map(n => n.likes)
-    expect(likes).toContain(
-        0
-    )
-})
+        test('fails without title', async () => {
+            const newBlog = {
+                author: 'Edsger W. Dijkstra',
+                url: 'http://www.google.com',
+            }
 
-test('4.12 adding blog without title or url fails', async () => {
-    
-    const user = helper.initialBlogs[0]
-    const newBlog = [{
-        author: 'Michael Chan',
-        likes: 3,
-        userID: user._id
-    }, {
-        title: 'Some title',
-        author: 'Michael Chan',
-        likes: 3,
-        userID: user._id
-    }, {
-        author: 'Michael Chan',
-        url: 'www.testurl.com',
-        likes: 3,
-        userID: user._id
-    }
-    ]
+            await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('Authorization', `bearer ${token}`)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+        })
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog[0])
-        .expect(400)
+        test('fails without title 2', async () => {
+            const newBlog = {
+                author: 'Edsger W. Dijkstra',
+                title: 'Primer of Algol 60 Programming,',
+            }
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog[1])
-        .expect(400)
-
-    await api
-        .post('/api/blogs')
-        .send(newBlog[2])
-        .expect(400)
-
+            await api
+                .post('/api/blogs')
+                .send(newBlog)
+                .set('Authorization', `bearer ${token}`)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+        })
+    })
 })
 
 afterAll(() => {

@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "blogs": [],
-    "username": "Hopottaja",
+    "username": "hopottaja2",
     "name": "Hessu Hopo",
-    "password": "9879sdfsa7"
+    "password": "123456"
 }

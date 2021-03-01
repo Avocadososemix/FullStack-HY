@@ -13,7 +13,7 @@ const Blog = ({ blog, likeBlog }) => {
     if (!fullStyle) {
         return (
             <div style={blogStyle}>
-                {blog.title}
+                {blog.title} {blog.author}
                 <button onClick={() => setFullStyle(true)}>view</button>
             </div>
         )

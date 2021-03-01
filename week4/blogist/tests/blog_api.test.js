@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const { before } = require('lodash')
 const mongoose = require('mongoose')
 const supertest = require('supertest')

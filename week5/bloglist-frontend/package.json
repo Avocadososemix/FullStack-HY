@@ -18,7 +18,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "json-server -p3001 db.json",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "cypress:open": "cypress open",
+    "start:test": "NODE_ENV=test node index.js"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +40,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3003"
+  "proxy": "http://localhost:3003",
+  "devDependencies": {
+    "cypress": "^6.6.0"
+  }
 }

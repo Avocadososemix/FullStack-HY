@@ -117,7 +117,7 @@ const App = () => {
             })
     }
 
-    const likeBlog = ( likedBlog) => {
+    const likeBlog = (likedBlog) => {
         console.log('likedblog ', likedBlog)
         const blog = blogs.find(blog => blog.id === likedBlog.id)
         const blogID = blog.id
@@ -156,6 +156,7 @@ const App = () => {
     if (user === null) {
         return (
             <div>
+                <h1>Blogs</h1>
                 <Notification message={errorMessage} />
                 <h2>Log in to application</h2>
                 <LoginForm

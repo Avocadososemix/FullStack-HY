@@ -11,7 +11,7 @@ router.get('/', async (request, response) => {
 
 router.post('/', async (request, response) => {
     const blog = new Blog(request.body)
-    if ( !blog.likes ) {
+    if (!blog.likes) {
         blog.likes = 0
     }
 
@@ -20,7 +20,7 @@ router.post('/', async (request, response) => {
     }
     const user = request.user
 
-    if ( !blog.title || !blog.url ) {
+    if (!blog.title || !blog.url) {
         return response.status(400).send({ error: 'title and url are required' })
     }
 
@@ -41,7 +41,7 @@ router.delete('/:id', async (request, response) => {
 
     const blog = await Blog.findById(request.params.id)
 
-    if ( user.id.toString() !== blog.user.toString() ) {
+    if (user.id.toString() !== blog.user.toString()) {
         return response.status(401).send({ error: 'you can only delete your own blogs' })
     }
 
@@ -53,10 +53,39 @@ router.delete('/:id', async (request, response) => {
 })
 
 router.put('/:id', async (request, response) => {
-    const blog = request.body
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    const body = request.body
+    console.log('this user guy: ', body.user)
+    const blog = {
+        title: body.title,
+        author: body.author,
+        url: body.author,
+        likes: body.likes,
+        // user: body.user
+    }
+    // console.log('backend put blog ', request)
+    // const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog)
 
     response.json(updatedBlog.toJSON())
 })
+
+// router.put('/:id', (request, response) => {
+//     const body = request.body
+
+//     const blog = {
+//         title: body.title,
+//         author: body.author,
+//         url: body.author,
+//         likes: body.likes,
+//         // user: body.user
+//     }
+
+//     Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+//         .then(updatedBlog => {
+//             response.json(updatedBlog.toJSON())
+//         })
+//         .catch(error => console.log('ERROR!!!!!', error))
+// })
+
 
 module.exports = router

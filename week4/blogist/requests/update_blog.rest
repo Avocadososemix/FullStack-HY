@@ -1,0 +1,11 @@
+PUT http://localhost:3003/api/blogs/603a6434e8682e1bd02ebf13
+Content-Type: application/json Authorization: bearer
+$2b$10$XNKKJdZCvE7RNbUKq7Gd3.cwxGrYESipaunCUBFhuBcBnKqErzbZ6
+
+{
+    "title": "Hessun mietinnät",
+    "author": "Joku",
+    "url": "testurl.com",
+    "likes": 1,
+    "userId": "6037b712fc143936f47fde14"
+}

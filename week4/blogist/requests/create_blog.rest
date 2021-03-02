@@ -1,11 +1,11 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json Authorization: bearer
-$2b$10$XNKKJdZCvE7RNbUKq7Gd3.cwxGrYESipaunCUBFhuBcBnKqErzbZ6
+$2b$10$H7VTBGsFwqCBSGh8xkwVAOtGPJCUJeljbOkRGLuLEqo8aIyWKG28W
 
 {
     "title": "Hessun mietinnät",
     "author": "Hessu Hopo",
     "url": "www.jee3.com",
     "likes": 22,
-    "userId": "6037b712fc143936f47fde14"
+    "userId": "603d5a234b7799421fea50e9"
 }

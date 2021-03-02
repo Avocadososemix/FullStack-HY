@@ -1,11 +1,10 @@
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 const router = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
 router.get('/', async (request, response) => {
     const blogs = await Blog
-        // .find({})
         .find({}).populate('user', { username: 1, name: 1 })
 
     response.json(blogs)
@@ -33,6 +32,13 @@ router.post('/', async (request, response) => {
     await user.save()
 
     response.status(201).json(savedBlog)
+})
+
+router.post('/reset', async (request, response) => {
+    await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    response.status(204).end()
 })
 
 router.delete('/:id', async (request, response) => {

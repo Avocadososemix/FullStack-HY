@@ -14,7 +14,7 @@ const AnecdoteForm = () => {
         console.log(content)
         const note = 'Added "'.concat(content, '" ')
         console.log(note)
-        dispatch(changeNotification(note, 5))
+        dispatch(changeNotification(note))
       }
 
     return (

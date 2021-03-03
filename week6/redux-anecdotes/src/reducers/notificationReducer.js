@@ -1,4 +1,4 @@
-const initialState = ['']
+const initialState = ''
 
 export const changeNotification = (notification) => {
     return {
@@ -6,7 +6,6 @@ export const changeNotification = (notification) => {
         data: notification
     }
 }
-
 
 export const removeNotification = () => {
     console.log('Im removing notifications')

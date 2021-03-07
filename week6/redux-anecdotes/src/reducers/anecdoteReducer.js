@@ -1,4 +1,5 @@
 import Notification from './../components/Notification'
+import anecdoteService from './../services/anecdotes'
 
 // const anecdotesAtStart = [
 //   'If it hurts, do it more often',
@@ -9,10 +10,20 @@ import Notification from './../components/Notification'
 //   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
 // ]
 
-export const createAnecdote = (data) => {
-  return {
-    type: 'NEW_ANECDOTE',
-    data,
+// export const createAnecdote = (data) => {
+//   return {
+//     type: 'NEW_ANECDOTE',
+//     data,
+//   }
+// }
+
+export const createAnecdote = content => {
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.createNew(content)
+    dispatch({
+      type: 'NEW_ANECDOTE',
+      data: newAnecdote,
+    })
   }
 }
 
@@ -44,10 +55,20 @@ const anecdoteReducer = (state = [], action) => {
   }
 }
 
-export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: 'INIT_ANECDOTES',
-    data: anecdotes,
+// export const initializeAnecdotes = (anecdotes) => {
+//   return {
+//     type: 'INIT_ANECDOTES',
+//     data: anecdotes,
+//   }
+// }
+
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch({
+      type: 'INIT_ANECDOTES',
+      data: anecdotes,
+    })
   }
 }
 

@@ -4,17 +4,19 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 
 import anecdoteReducer from './reducers/anecdoteReducer'
 import filterReducer from './reducers/filterReducer'
+import notificationReducer from './reducers/notificationReducer'
 
 const reducer = combineReducers({
-  notes: anecdoteReducer,
-  filter: filterReducer,
+    notification: notificationReducer,
+    anecdotes: anecdoteReducer,
+    filter: filterReducer
 })
 
 const store = createStore(
-  reducer,
-  composeWithDevTools(
-    applyMiddleware(thunk)
-  )
+    reducer,
+    composeWithDevTools(
+        applyMiddleware(thunk)
+    )
 )
 
 export default store

@@ -7,11 +7,11 @@ export const changeNotification = (notification) => {
     }
 }
 
-export const removeNotification = () => {
+export const removeNotification = (notification) => {
     console.log('Im removing notifications')
     return {
         type: 'REMOVE_NOTIFICATION',
-        data: ''
+        data: ""
     }
 }
 

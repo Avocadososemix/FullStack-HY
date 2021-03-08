@@ -1,14 +1,18 @@
 const initialState = ''
 
-export const changeNotification = (notification) => {
-    return {
-        type: 'NEW_NOTIFICATION',
-        data: notification
+export const setNotification = (notification, fadeout ) => {
+    return async (dispatch) => {
+        dispatch({
+            type: 'NEW_NOTIFICATION',
+            data: notification
+        })
+        setTimeout(() => {
+            dispatch(removeNotification())
+        }, fadeout * 1000)
     }
 }
 
-export const removeNotification = (notification) => {
-    console.log('Im removing notifications')
+export const removeNotification = () => {
     return {
         type: 'REMOVE_NOTIFICATION',
         data: ""

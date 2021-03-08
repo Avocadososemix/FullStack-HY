@@ -1,7 +1,8 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { createAnecdote } from './../reducers/anecdoteReducer'
-import { changeNotification, removeNotification } from './../reducers/notificationReducer'
+// import { changeNotification, removeNotification } from './../reducers/notificationReducer'
+import { setNotification } from './../reducers/notificationReducer'
 import anecdoteService from './../services/anecdotes'
 import { changeFilter } from '../reducers/filterReducer'
 
@@ -12,14 +13,9 @@ const AnecdoteForm = () => {
         event.preventDefault()
         const content = event.target.anecdote.value
         event.target.anecdote.value = ''
-
-        // const newAnecdote = await anecdoteService.createNew(content)
         dispatch(createAnecdote(content))
         const note = 'Added "'.concat(content, '" ')
-        dispatch(changeNotification(note))
-        setTimeout(() => {
-            dispatch(removeNotification(note))
-        }, 5000)
+        dispatch(setNotification(`you voted '${content}'`, 5))
       }
 
     return (

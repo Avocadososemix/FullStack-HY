@@ -27,3 +27,7 @@ const Filter = () => {
 }
 
 export default Filter
+
+// const ConnectedFilter = connect(mapStateToProps)(Filter)
+
+// export default ConnectedFilter

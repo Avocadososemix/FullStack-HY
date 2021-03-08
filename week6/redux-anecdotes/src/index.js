@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom'
 import { createStore, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App'
 import store from './store'
 import anecdoteReducer, { initializeAnecdotes } from './reducers/anecdoteReducer'
